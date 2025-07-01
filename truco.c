@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
+#include <stdlib.h>
 
 #define CARTAS 10 // Cartas Utilizadas no Jogo
 #define NAIPES 4
 
 void embaralhar();
+int randomico(int n);
 
 typedef struct{
     char nome;
@@ -20,7 +23,12 @@ int baralho[CARTAS][NAIPES];
 int main(){
 
     embaralhar();
-    printf("%c %s\n", cartas[9].nome, naipes[3]);
+    for(int i =0; i < CARTAS; i++){
+        for(int j = 0; j < NAIPES; j++){
+            printf("%c %s\n", cartas[i].nome, naipes[j]);
+            printf("%i\n", randomico(10));
+        }
+    }
     return 0;
 }
 
@@ -42,7 +50,7 @@ void embaralhar(){
         }
 
         for(int j = 0; j < NAIPES; j++){
-            baralho[i][j] = 0;
+            baralho[i][j] = -1;
         }
     }
 
@@ -51,4 +59,13 @@ void embaralhar(){
     strcpy(naipes[2], "Copas");
     strcpy(naipes[3], "Paus");
 
+}
+
+int randomico(int n){
+
+    clock_t tempo;
+    tempo = clock();
+    srand((int)tempo);
+
+    return rand() % n;
 }
