@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #define CARTAS 40 // Total de cartas utilizadas no jogo
-#define JOGADORES 4
+#define MAX_JOGADORES 8
 #define MAO 3 // Quantas cartas cada jogador vai ter
 
 void embaralhar();
@@ -14,6 +14,7 @@ int randomico(int n);
 void mostrar_baralho();
 int vira();
 void dar_cartas();
+void rodadas();
 
 typedef struct{
     char nome;
@@ -25,21 +26,26 @@ typedef struct{
 typedef struct{
     char nome[50];
     bool time;
+    bool cpu;
     int carta_payer[MAO];
 }payer;
 
+typedef struct{
+    char nome[50];
+    int pontos;
+}time1;
+
 carta baralho[CARTAS];
-payer payers[JOGADORES];
-char times[2][50];
+payer payers[MAX_JOGADORES];
+time1 times[2];
+int jogadores;
 
 
 int main(){
 
-    embaralhar();
     ler_players();
-    vira();
-    dar_cartas();
-    mostrar_baralho();
+    rodadas();
+    //mostrar_baralho();
     
     return 0;
 }
@@ -91,8 +97,8 @@ void mostrar_baralho(){
     }
     printf("\n");
 
-    for(int i = 0; i < JOGADORES; i++){
-        printf("Nome: %s, Time: %s \nCartas: | ", payers[i].nome, times[(int)payers[i].time]);
+    for(int i = 0; i < jogadores; i++){
+        printf("Nome: %s, Time: %s \nCartas: | ", payers[i].nome, times[(int)payers[i].time].nome);
         for(int j = 0; j < MAO; j++){
             printf("%c %s | ", baralho[payers[i].carta_payer[j]].nome, baralho[payers[i].carta_payer[j]].naipe);
         }
@@ -121,14 +127,22 @@ int vira(){
 
 void ler_players(){
 
+    do{
+        printf("Digite a quantidade de jogadores (Apenas números pares, lembrando que o máximo de jogadores é %d): ", MAX_JOGADORES);
+        scanf("%d", &jogadores);
+        getchar();
+    }while(jogadores % 2 != 0 || jogadores < 1 || jogadores > MAX_JOGADORES);
+
     for(int i = 0; i < 2; i++){
         printf("Digite o nome do %dº time: ", i+1);
-        fgets(times[i], 50, stdin);
-        times[i][strlen(times[i])-1] = '\0';
+        fgets(times[i].nome, 50, stdin);
+        times[i].nome[strlen(times[i].nome)-1] = '\0';
+        times[i].pontos = 0;
     }
 
-    for(int i = 0; i < JOGADORES; i++){
+    for(int i = 0; i < jogadores; i++){
 
+        int opt;
         if(i % 2 == 0){
             payers[i].time = false;
         }else{
@@ -138,13 +152,28 @@ void ler_players(){
         printf("Player %d, digite seu nome: ", i+1);
         fgets(payers[i].nome, 50, stdin);
         payers[i].nome[strlen(payers[i].nome)-1] = '\0';
-        printf("Player %s, você faz parte do time %s\n", payers[i].nome, times[(int)payers[i].time]);
+
+        do{
+            printf("Esse player é um pessoa (digite 1) ou computador (digite 0): ");
+            scanf("%d", &opt);
+            getchar();
+        }while(opt != 0 && opt != 1);
+
+        if(opt == 1){
+            payers[i].cpu == false;
+        }else{
+            payers[i].cpu == true;
+        }
+
+        printf("Player %s, você faz parte do time %s\n", payers[i].nome, times[(int)payers[i].time].nome);
+
+        
     }
 }
 
 void dar_cartas(){
     int k;
-    for(int i = 0; i < JOGADORES; i++){
+    for(int i = 0; i < jogadores; i++){
         for(int j = 0; j < MAO; j++){
             do{
                 k = randomico(40);
@@ -154,4 +183,16 @@ void dar_cartas(){
             baralho[k].status = -1;
         }
     }
+}
+
+void rodadas(){
+
+    do{
+        embaralhar();
+        vira();
+        dar_cartas();
+
+
+    }while(times[0].pontos < 12 && times[1].pontos < 12);
+
 }
