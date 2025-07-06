@@ -19,7 +19,7 @@ void rodadas();
 typedef struct{
     char nome;
     char naipe[10];
-    int status; // 0 = disponível, 1 = jogada, -1 = já foi pega
+    int status; // 0 = disponível, 1 = i, -1 = já foi pega
     int valor;
 }carta;
 
@@ -83,9 +83,7 @@ void embaralhar(){
 
 int randomico(int n){
 
-    clock_t tempo;
-    tempo = clock();
-    srand((int)tempo);
+    srand((int)clock());
 
     return rand() % n;
 }
@@ -120,7 +118,7 @@ int vira(){
 
     baralho[k].status = 1;
 
-    printf("A vira é %c %s\n", baralho[k].nome, baralho[k].naipe);
+    printf("A vira é %c %s\n\n", baralho[k].nome, baralho[k].naipe);
 
     return k;
 }
@@ -165,13 +163,14 @@ void ler_players(){
             payers[i].cpu == true;
         }
 
-        printf("Player %s, você faz parte do time %s\n", payers[i].nome, times[(int)payers[i].time].nome);
+        printf("Player %s, você faz parte do time %s\n\n", payers[i].nome, times[(int)payers[i].time].nome);
 
         
     }
 }
 
 void dar_cartas(){
+    
     int k;
     for(int i = 0; i < jogadores; i++){
         for(int j = 0; j < MAO; j++){
@@ -187,11 +186,37 @@ void dar_cartas(){
 
 void rodadas(){
 
+    int trucos[2];
+    int parcial[2];
+
     do{
+        printf("\n");
         embaralhar();
         vira();
         dar_cartas();
 
+        trucos[0] = 0;
+        trucos[1] = 0;
+        parcial[0] = 0;
+        parcial[1] = 0;
+
+        for(int rodada = 0; rodada < 3; rodada++){
+
+            for(int i = 0; i < jogadores; i++){
+
+                printf("Vez do Player %s\nAs suas cartas são:\n",payers[i].nome);
+                for(int j = 0; j < MAO; j++){
+                    if(baralho[payers[i].carta_payer[j]].status == -1){
+                        printf("Carta %d: %c %s\n", j, baralho[payers[i].carta_payer[j]].nome, baralho[payers[i].carta_payer[j]].naipe);
+                    }else{
+                        printf("Carta %d: JÁ JOGADA\n",j);
+                    }
+                }
+                printf("\n");
+
+            }
+
+        }
 
     }while(times[0].pontos < 12 && times[1].pontos < 12);
 
