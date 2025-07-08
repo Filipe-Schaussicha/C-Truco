@@ -286,29 +286,8 @@ void rodadas(){
 
         fimRodada:
 
-        
+        // Continuar aqui
 
     }while(times[0].pontos < 12 && times[1].pontos < 12);
-
-}
-
-void sort_carta(int *array, int size){
-
-    int buffer;
-
-    for(int i = 0; i < size; i++){
-        for(int j = i+1; j < size; j++){
-
-            if(*(array+i) != -2 && *(array+j) != -2){
-                if(baralho[*(array+i)].valor <= baralho[*(array+j)].valor){
-
-                    buffer = *(array+i);
-                    *(array+i) = *(array+j);
-                    *(array+j) = buffer;
-
-                }
-            }
-        }
-    }
 
 }
