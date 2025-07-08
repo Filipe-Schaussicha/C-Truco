@@ -138,6 +138,8 @@ void ler_players(){
         times[i].pontos = 0;
     }
 
+    char s[2][8] = {"não é", "é"};
+
     for(int i = 0; i < jogadores; i++){
 
         int opt;
@@ -152,20 +154,18 @@ void ler_players(){
         payers[i].nome[strlen(payers[i].nome)-1] = '\0';
 
         do{
-            printf("Esse player é um pessoa (digite 1) ou computador (digite 0): ");
+            printf("Esse player é um pessoa (digite 0) ou computador (digite 1): ");
             scanf("%d", &opt);
             getchar();
         }while(opt != 0 && opt != 1);
 
-        if(opt == 1){
-            payers[i].cpu == false;
+        if(opt == 0){
+            payers[i].cpu = false;
         }else{
-            payers[i].cpu == true;
+            payers[i].cpu = true;
         }
 
-        printf("Player %s, você faz parte do time %s\n\n", payers[i].nome, times[(int)payers[i].time].nome);
-
-        
+        printf("Player %s, você faz parte do time %s e %s controlado pelo computador\n\n", payers[i].nome, times[(int)payers[i].time].nome, s[payers[i].cpu]);
     }
 }
 
@@ -186,8 +186,7 @@ void dar_cartas(){
 
 void rodadas(){
 
-    int trucos[2];
-    int parcial[2];
+    int trucos, rodada, parcial[2], askTruco, opt, trucado;
 
     do{
         printf("\n");
@@ -195,28 +194,78 @@ void rodadas(){
         vira();
         dar_cartas();
 
-        trucos[0] = 0;
-        trucos[1] = 0;
-        parcial[0] = 0;
+        rodada = 0;
+        trucos = 0;
+        parcial[0] = 1;
         parcial[1] = 0;
+        askTruco = -1;
+        trucado = -1;
 
-        for(int rodada = 0; rodada < 3; rodada++){
-
+        do{
+            rodada++;
             for(int i = 0; i < jogadores; i++){
 
                 printf("Vez do Player %s\nAs suas cartas são:\n",payers[i].nome);
                 for(int j = 0; j < MAO; j++){
                     if(baralho[payers[i].carta_payer[j]].status == -1){
-                        printf("Carta %d: %c %s\n", j, baralho[payers[i].carta_payer[j]].nome, baralho[payers[i].carta_payer[j]].naipe);
+                        printf("Carta %d: %c %s\n", j+1, baralho[payers[i].carta_payer[j]].nome, baralho[payers[i].carta_payer[j]].naipe);
                     }else{
                         printf("Carta %d: JÁ JOGADA\n",j);
                     }
                 }
                 printf("\n");
 
+                if((int)payers[i].time == trucado){
+                    (trucos == 0) ? printf("Pediram truco, aceitar? (1 = sim, 0 = não): ") : printf("Pediram %d, aceitar? (1 = sim, 0 = não): ", (trucos+1)*3);
+
+                    if(payers[i].cpu){
+                        opt = (randomico(3)) % 2;
+                    }else{
+                        do{
+                            scanf("%d", &opt);
+                        }while(opt != 0 && opt != 1);
+                    }
+
+                    if(opt == 1){
+                        trucos++;
+                        trucado = -1;
+                    }else{
+                        goto fimRodada;
+                    }
+                }
+
+                if(askTruco != (int)payers[i].time){
+
+                    (trucos == 0) ? printf("Você quer pedir truco? (1 = sim, 0 = não): ") : printf("Você quer pedir %d? (1 = sim, 0 = não): ", (trucos+1)*3);
+
+                    if(payers[i].cpu){
+                        opt = (randomico(3)) % 2;
+                    }else{
+                        do{
+                            scanf("%d", &opt);
+                        }while(opt != 0 && opt != 1);
+                    }
+
+                    if(opt == 1){
+                        askTruco = (int)payers[i].time;
+                        trucado = (int)!payers[i].time;
+                    }
+                    
+                }
+
+                printf("Que carta você quer jogar? (digite 1, 2 ou 3): ");
+                if(payers[i].cpu){
+                    opt = randomico(3) + 1;
+                }else{
+                    do{
+                        scanf("%d", &opt);
+                    }while(opt < 1 || opt > 3);
+                }
             }
 
-        }
+            fimRodada:
+
+        }while(rodada < 2 || parcial[0] == parcial[1]);
 
     }while(times[0].pontos < 12 && times[1].pontos < 12);
 
