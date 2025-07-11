@@ -39,6 +39,8 @@ int vira();
 void dar_cartas();
 void rodadas();
 void falar_ganhador(int ganhador);
+void limparTerminal();
+void falar_info(int cartaVira, int parcial0, int parcial1, char msgJogada[300], char msgRodada[300], char msgTurno[300]);
 
 typedef struct{
     char nome;
@@ -156,8 +158,6 @@ int vira(){
 
     baralho[vira].status = 2; // Indica que a vira não está mais disponível no baralho
 
-    printf("A vira é: \n|\t %c %s \t|\n\n", baralho[vira].nome, baralho[vira].naipe); // Diz qual é a vira
-
     return vira; // Retorna a posição da vira no baralho, que não é utilizado em lugar nenhum :(
 }
 
@@ -230,13 +230,15 @@ void dar_cartas(){
 // Aqui onde o jogo realmente acontece
 void rodadas(){
 
-    int opt;
+    int opt; char msgJogada[300], msgTurno[300], msgRodada[300];
+    strcpy(msgRodada, "");
+    strcpy(msgTurno, "");
 
     // Repete por todas as rodadas do jogo, o jogo acaba quanto aguém chegar em 12 pontos
     do{ 
         printf("\n");
         embaralhar();
-        vira();
+        int cartaVira = vira();
         dar_cartas();
 
         int Turno = 0, trucos = 0, parcial[] = {0,0}; 
@@ -255,6 +257,7 @@ void rodadas(){
         do{ 
             // Esse array salva a carta mais forte jogada por cada time nesse turno, o -2 indica que esse time ainda não jogo nenhuma carta
             int cartasJogadas[2] = {-2,-2};
+            strcpy(msgJogada, "");
 
             // Dá a oportunidade de cada jogador jogar uma vez
             for(int i = 0; i < jogadores; i++){
@@ -262,6 +265,11 @@ void rodadas(){
                 // Indica quantas cartas esse jogador tem na sua mão pra jogar nesse turno (varia entre 1 e 3)
                 int cartasDisponiveis = 0; 
                 bool timeAtual = payers[i].time;
+
+                // Imprime a vira na tela
+                falar_info(cartaVira, parcial[0], parcial[1], msgJogada, msgRodada, msgTurno);
+                strcpy(msgRodada, "");
+                strcpy(msgTurno, "");
 
                 // Escreve todas as cartas desse jogador que ainda não foram jogadas
                 (times[(int)timeAtual].pontos == 11 || times[(int)!timeAtual].pontos == 11) ? printf("RODADA AS CEGAS") : printf("Vez do Player %s\nAs suas cartas são:\n",payers[i].nome);
@@ -339,30 +347,32 @@ void rodadas(){
                 // Registra que essa carta foi jogada
                 baralho[payers[i].carta_payer[opt]].status = 1; 
 
+                limparTerminal();
+
                 // Verifica qual carta mais forte de cada time é a mais forte, e depois escreve o resultado na tela
-                if(baralho[cartasJogadas[0]].valor > baralho[cartasJogadas[1]].valor){
-                    printf("\nA carta | %c %s | do time \"%s\" está fazendo\n\n", baralho[cartasJogadas[0]].nome, baralho[cartasJogadas[0]].naipe, times[0].nome);
-                    fazendo = 0;
-                }else if(baralho[cartasJogadas[0]].valor < baralho[cartasJogadas[1]].valor){
-                    printf("\nA carta | %c %s | do time \"%s\" está fazendo\n\n", baralho[cartasJogadas[1]].nome, baralho[cartasJogadas[1]].naipe, times[1].nome);
-                    fazendo = 1;
-                }else{
-                    printf("Empachado, entre as cartas | %c %s | e | %c %s |\n\n", baralho[cartasJogadas[0]].nome, baralho[cartasJogadas[0]].naipe, baralho[cartasJogadas[1]].nome, baralho[cartasJogadas[1]].naipe);
+                if(baralho[cartasJogadas[0]].valor == baralho[cartasJogadas[1]].valor && cartasJogadas[1] != -2 &&  cartasJogadas[0] != -2){
+                    sprintf(msgJogada, "Empachado, entre as cartas | %c %s | e | %c %s |\n", baralho[cartasJogadas[0]].nome, baralho[cartasJogadas[0]].naipe, baralho[cartasJogadas[1]].nome, baralho[cartasJogadas[1]].naipe);
                     fazendo = -1;
+                }else{
+                    (baralho[cartasJogadas[0]].valor > baralho[cartasJogadas[1]].valor || cartasJogadas[1] == -2) ? (fazendo = 0) : (fazendo = 1);
+
+                    sprintf(msgJogada, "A carta | %c %s | do time \"%s\" está fazendo\n", baralho[cartasJogadas[fazendo]].nome, baralho[cartasJogadas[fazendo]].naipe, times[fazendo].nome);
                 }
 
             }
 
             // Verifica quem ganhou o turno
             if(fazendo == -1){
-                printf("O turno terminou empachada\n\n");
+                sprintf(msgTurno, "O turno terminou empachado\n");
             }else{
-                printf("o time %s ganhou esse turno\n\n", times[fazendo].nome);
+                sprintf(msgTurno, "O time %s ganhou esse turno\n", times[fazendo].nome);
                 parcial[fazendo]++;
             }
 
             Turno++;
+
         }while((Turno < 2 || parcial[0] == parcial[1]) && Turno < 3);
+
 
         // Verifica quem ganhou a rodada e faz a adição dos pontos baseado na quantidade de trucos pedidos
         if(parcial[0] != parcial[1]){
@@ -374,14 +384,16 @@ void rodadas(){
             // Adiciona a pontuação, baseada na quantidade de trucos
             (trucos == 0) ? (times[ganhador].pontos++) : (times[ganhador].pontos += 3 * trucos);
 
-            printf("\nO time %s ganhou esse turno\nPontos totais: \n%s: %d pontos\n%s: %d pontos\n\n", times[ganhador].nome, times[0].nome, times[0].pontos, times[1].nome, times[1].pontos);
+            sprintf(msgRodada, "O time %s ganhou essa rodada\n", times[ganhador].nome);
 
         }else{
             // Se caso houver empate
-            printf("\nNenhum time ganhou esse turno\nPontos totais: \n%s: %d pontos\n%s: %d pontos\n\n", times[0].nome, times[0].pontos, times[1].nome, times[1].pontos);
+            sprintf(msgRodada,"Nenhum time ganhou essa rodada\n");
         }
 
     }while(times[0].pontos < 12 && times[1].pontos < 12);
+
+    limparTerminal();
 
     (times[0].pontos > times[1].pontos) ? falar_ganhador(0) : falar_ganhador(1);
 
@@ -390,22 +402,47 @@ void rodadas(){
 // Apenas escreve o nome do time ganhador de uma forma mais estilosa
 void falar_ganhador(int ganhador){
 
+    printf("| TIME GANHADOR: |\n\n");
+
     int len = strlen(times[ganhador].nome);
 
-    printf(" ");
-    for(int i = -2; i < len; i++){
-        printf("_");
-    }
-    printf("\n/");
-    for(int i = -2; i < len; i++){
-        printf(" ");
-    }
-
-    printf("\\\n| %s |\n\\", times[ganhador].nome);
-
+    printf("\t ");
     for(int i = -2; i < len; i++){
         printf("_");
     }
 
-    printf("/\n");
+    printf("\n\t< %s >\n\t ", times[ganhador].nome);
+
+    for(int i = -2; i < len; i++){
+        printf("-");
+    }
+
+    printf("\n\n");
+}
+
+void limparTerminal() { // Apenas limpa o terminal
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+
+    printf("\n");
+}
+
+void falar_info(int cartaVira, int parcial0, int parcial1, char msgJogada[300], char msgRodada[300], char msgTurno[300]){
+
+    limparTerminal();
+
+    printf("Pontuação parcial dessa rodada:\nTime %s: %d\nTime %s: %d\n\n", times[0].nome, parcial0, times[1].nome, parcial1);
+
+    printf("Pontuação total:\nTime %s: %d\nTime %s: %d\n\n", times[0].nome, times[0].pontos, times[1].nome, times[1].pontos);
+
+    (msgJogada[0] != '\0') && printf("%s\n", msgJogada);
+
+    (msgTurno[0] != '\0') && printf("%s\n", msgTurno);
+    
+    (msgRodada[0] != '\0') && printf("%s\n", msgRodada);
+
+    printf("A vira é: \n|\t %c %s \t|\n\n", baralho[cartaVira].nome, baralho[cartaVira].naipe);
 }
