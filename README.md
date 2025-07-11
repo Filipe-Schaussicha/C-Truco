@@ -15,7 +15,7 @@ Este projeto consiste em uma implementação simples do jogo de **Truco (versão
 
 ## ⚙️ Compilação e Execução
 
-Para compilar o jogo, utilize o seguinte comando no terminal:
+Para compilar o jogo, instale o compilador gcc e utilize o seguinte comando no terminal:
 
 ```bash
 gcc -o truco truco.c
@@ -33,7 +33,7 @@ E para executá-lo:
 
 ## 💡 Considerações
 
-Apesar de ser uma versão simplificada, o projeto cobre as principais regras e dinâmicas do Truco. A experiência foi importante para aplicar conceitos de lógica de programação, uso de estruturas condicionais, loops, `structs` e gerenciamento de estado de jogo.
+Apesar de ser uma versão simplificada, o projeto cobre as principais regras e dinâmicas do Truco. A experiência foi importante para aplicar conceitos de lógica de programação, uso de estruturas condicionais, loops, structs e gerenciamento de estado de jogo.
 
 ## 🧑‍💻 Créditos
 
