@@ -1,3 +1,26 @@
+/*
+ * Jogo de Truco (Versão Paulista)
+ *
+ * Autor: Filipe S. de Medeiros
+ * Curso: Bacharelado em Ciências da Computação - UNESP
+ * Data: Julho de 2025
+ *
+ * Descrição:
+ * Implementação em linguagem C de uma versão simplificada do jogo de Truco,
+ * com suporte a:
+ *  - Embaralhamento e distribuição de cartas
+ *  - Rodadas com comparação de cartas
+ *  - Sistema de pontuação
+ *  - Mecânica de pedidos de Truco (3, 6, 9, 12)
+ * 
+ * Observação:
+ * Por ser uma versão em terminal, ambos os jogadores compartilham a mesma tela.
+ *
+ * Objetivo:
+ * Desenvolvido com fins educacionais e como desafio pessoal para praticar lógica
+ * de programação, manipulação de estruturas e controle de fluxo em C.
+ */
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
