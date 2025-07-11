@@ -15,7 +15,7 @@ void mostrar_baralho();
 int vira();
 void dar_cartas();
 void rodadas();
-void sort_carta(int *array, int size);
+void falar_ganhador(int ganhador);
 
 typedef struct{
     char nome;
@@ -223,7 +223,7 @@ void rodadas(){
                     }
                 }
 
-                if(askTruco != (int)payers[i].time){
+                if(askTruco != (int)payers[i].time && trucos < 6){
 
                     do{
 
@@ -284,10 +284,43 @@ void rodadas(){
             rodada++;
         }while((rodada < 2 || parcial[0] == parcial[1]) && rodada < 3);
 
-        fimRodada:
+        if(parcial[0] != parcial[1]){
+            (parcial[0] > parcial[1]) ? (ganhador = 0) : (ganhador = 1);
 
-        // Continuar aqui
+            fimRodada:
+
+            (trucos == 0) ? (times[ganhador].pontos++) : (times[ganhador].pontos = 3 * trucos);
+
+            printf("\nO time %s ganhou esse turno\nPontos totais: \n%s: %d pontos\n%s: %d pontos\n\n", times[ganhador].nome, times[0].nome, times[0].pontos, times[1].nome, times[1].pontos);
+
+        }else{
+            printf("\nNenhum time ganhou esse turno\nPontos totais: \n%s: %d pontos\n%s: %d pontos\n\n", times[0].nome, times[0].pontos, times[1].nome, times[1].pontos);
+        }
 
     }while(times[0].pontos < 12 && times[1].pontos < 12);
 
+    (times[0].pontos > times[1].pontos) ? falar_ganhador(0) : falar_ganhador(1);
+
+}
+
+void falar_ganhador(int ganhador){
+
+    int len = strlen(times[ganhador].nome);
+
+    printf(" ");
+    for(int i = -2; i < len; i++){
+        printf("_");
+    }
+    printf("\n/");
+    for(int i = -2; i < len; i++){
+        printf(" ");
+    }
+
+    printf("\\\n| %s |\n\\", times[ganhador].nome);
+
+    for(int i = -2; i < len; i++){
+        printf("_");
+    }
+
+    printf("/\n");
 }
