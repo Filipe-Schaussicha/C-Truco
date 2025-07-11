@@ -205,7 +205,7 @@ void dar_cartas(){
 }
 
 // Aqui onde o jogo realmente acontece
-void rodadas(){ 
+void rodadas(){
 
     int opt;
 
@@ -238,18 +238,24 @@ void rodadas(){
 
                 // Indica quantas cartas esse jogador tem na sua mão pra jogar nesse turno (varia entre 1 e 3)
                 int cartasDisponiveis = 0; 
+                bool timeAtual = payers[i].time;
 
                 // Escreve todas as cartas desse jogador que ainda não foram jogadas
-                printf("Vez do Player %s\nAs suas cartas são:\n",payers[i].nome); 
+                (times[(int)timeAtual].pontos == 11 || times[(int)!timeAtual].pontos == 11) ? printf("RODADA AS CEGAS") : printf("Vez do Player %s\nAs suas cartas são:\n",payers[i].nome);
+
                 for(int j = 0; j < MAO; j++){
-
-                    (baralho[payers[i].carta_payer[j]].status == -1) && printf("Carta %d: %c %s\n", ++cartasDisponiveis, baralho[payers[i].carta_payer[j]].nome, baralho[payers[i].carta_payer[j]].naipe);
-
+                    if(baralho[payers[i].carta_payer[j]].status == -1){
+                        ++cartasDisponiveis;
+                        if(times[(int)timeAtual].pontos < 11 && times[(int)!timeAtual].pontos < 11){
+                            printf("Carta %d: %c %s\n", cartasDisponiveis, baralho[payers[i].carta_payer[j]].nome, baralho[payers[i].carta_payer[j]].naipe);
+                        }
+                    }
                 }
                 printf("\n");
 
+
                 // Verifica se o time desse player já foi trucado
-                if((int)payers[i].time == trucado){ 
+                if((int)timeAtual == trucado){ 
 
                     do{
                         (trucos == 0) ? printf("Pediram truco, aceitar? (1 = sim, 0 = não): ") : printf("Pediram %d, aceitar? (1 = sim, 0 = não): ", (trucos+1)*3);
@@ -263,13 +269,13 @@ void rodadas(){
                         trucos++;
                         trucado = -1;
                     }else{ // Caso ele regeite, já acaba essa rodada/mão, com o time opositor ganhando e já pulando para a contagem de pontos
-                        ganhador = (int)!payers[i].time;
+                        ganhador = (int)!timeAtual;
                         goto fimTurno;
                     }
                 }
 
                 // Se o time desse player não foi o último a pedir truco, ele terá a opção de pedir
-                if(askTruco != (int)payers[i].time && trucos < 6){ 
+                if(askTruco != (int)timeAtual && trucos < 6 && times[(int)timeAtual].pontos < 11){ 
 
                     do{
 
@@ -280,8 +286,8 @@ void rodadas(){
                     }while(opt != 0 && opt != 1);
 
                     if(opt == 1){
-                        askTruco = (int)payers[i].time;
-                        trucado = (int)!payers[i].time;
+                        askTruco = (int)timeAtual;
+                        trucado = (int)!timeAtual;
                     }
                     
                 }
@@ -305,7 +311,7 @@ void rodadas(){
                 }
 
                 // Verifica se carta que o player jogo é maior do que as que foram jogas antes por seu time, se for ela será salva no array cartasJogadas do seu time
-                (payers[i].carta_payer[opt] > cartasJogadas[(int)payers[i].time]) && (cartasJogadas[(int)payers[i].time] = payers[i].carta_payer[opt]);  
+                (payers[i].carta_payer[opt] > cartasJogadas[(int)timeAtual]) && (cartasJogadas[(int)timeAtual] = payers[i].carta_payer[opt]);  
 
                 // Registra que essa carta foi jogada
                 baralho[payers[i].carta_payer[opt]].status = 1; 
@@ -358,7 +364,8 @@ void rodadas(){
 
 }
 
-void falar_ganhador(int ganhador){ // Apenas escreve o nome do time ganhador de uma forma mais estilosa
+// Apenas escreve o nome do time ganhador de uma forma mais estilosa
+void falar_ganhador(int ganhador){
 
     int len = strlen(times[ganhador].nome);
 
