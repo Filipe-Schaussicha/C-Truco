@@ -372,7 +372,7 @@ void rodadas(){
             fimTurno:
 
             // Adiciona a pontuação, baseada na quantidade de trucos
-            (trucos == 0) ? (times[ganhador].pontos++) : (times[ganhador].pontos = 3 * trucos);
+            (trucos == 0) ? (times[ganhador].pontos++) : (times[ganhador].pontos += 3 * trucos);
 
             printf("\nO time %s ganhou esse turno\nPontos totais: \n%s: %d pontos\n%s: %d pontos\n\n", times[ganhador].nome, times[0].nome, times[0].pontos, times[1].nome, times[1].pontos);
 
