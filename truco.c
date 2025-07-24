@@ -40,7 +40,7 @@ void dar_cartas();
 void rodadas();
 void falar_ganhador(int ganhador);
 void limparTerminal();
-void falar_info(int cartaVira, int parcial0, int parcial1, char msgJogada[300], char msgRodada[300], char msgTurno[300]);
+void falar_info(int cartaVira, int parcial0, int parcial1, char msgJogada[300], char msgRodada[300], char msgTurno[300], char msgTruco[300]);
 
 typedef struct{
     char nome;
@@ -230,9 +230,10 @@ void dar_cartas(){
 // Aqui onde o jogo realmente acontece
 void rodadas(){
 
-    int opt; char msgJogada[300], msgTurno[300], msgRodada[300];
+    int opt; char msgJogada[300], msgTurno[300], msgRodada[300], msgTruco[300];
     strcpy(msgRodada, "");
     strcpy(msgTurno, "");
+    strcpy(msgTruco, "");
 
     // Repete por todas as rodadas do jogo, o jogo acaba quanto aguém chegar em 12 pontos
     do{ 
@@ -267,9 +268,10 @@ void rodadas(){
                 bool timeAtual = payers[i].time;
 
                 // Imprime a vira na tela
-                falar_info(cartaVira, parcial[0], parcial[1], msgJogada, msgRodada, msgTurno);
+                falar_info(cartaVira, parcial[0], parcial[1], msgJogada, msgRodada, msgTurno, msgTruco);
                 strcpy(msgRodada, "");
                 strcpy(msgTurno, "");
+                strcpy(msgTruco, "");
 
                 // Escreve todas as cartas desse jogador que ainda não foram jogadas
                 (times[(int)timeAtual].pontos == 11 || times[(int)!timeAtual].pontos == 11) ? printf("RODADA AS CEGAS") : printf("Vez do Player %s\nAs suas cartas são:\n",payers[i].nome);
@@ -297,10 +299,13 @@ void rodadas(){
 
                     // Se o player aceitar o truco, o número de "trucos pedidos" aumenta em 1 e esse time não é mais considerado "trucado"
                     if(opt == 1){ 
+                        (trucos == 0) ? sprintf(msgTruco, "Time %s aceitou o truco", times[(int)timeAtual].nome) : sprintf(msgTruco, "Time %s aceitou o %d", times[(int)timeAtual].nome, (trucos+1)*3);
                         trucos++;
                         trucado = -1;
+                        
                     }else{ // Caso ele regeite, já acaba essa rodada/mão, com o time opositor ganhando e já pulando para a contagem de pontos
                         ganhador = (int)!timeAtual;
+                        (trucos == 0) ? sprintf(msgTruco, "Time %s aceitou o truco", times[(int)timeAtual].nome) : sprintf(msgTruco, "Time %s aceitou o %d", times[(int)timeAtual].nome, (trucos+1)*3);
                         goto fimTurno;
                     }
                 }
@@ -430,7 +435,7 @@ void limparTerminal() { // Apenas limpa o terminal
     printf("\n");
 }
 
-void falar_info(int cartaVira, int parcial0, int parcial1, char msgJogada[300], char msgRodada[300], char msgTurno[300]){
+void falar_info(int cartaVira, int parcial0, int parcial1, char msgJogada[300], char msgRodada[300], char msgTurno[300], char msgTruco[300]){
 
     limparTerminal();
 
@@ -439,6 +444,8 @@ void falar_info(int cartaVira, int parcial0, int parcial1, char msgJogada[300], 
     printf("Pontuação total:\nTime %s: %d\nTime %s: %d\n\n", times[0].nome, times[0].pontos, times[1].nome, times[1].pontos);
 
     (msgJogada[0] != '\0') && printf("%s\n", msgJogada);
+
+    (msgTruco[0] != '\0') && printf("%s\n", msgTruco);
 
     (msgTurno[0] != '\0') && printf("%s\n", msgTurno);
     
