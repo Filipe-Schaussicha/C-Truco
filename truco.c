@@ -305,7 +305,7 @@ void rodadas(){
                         
                     }else{ // Caso ele regeite, já acaba essa rodada/mão, com o time opositor ganhando e já pulando para a contagem de pontos
                         ganhador = (int)!timeAtual;
-                        (trucos == 0) ? sprintf(msgTruco, "Time %s aceitou o truco", times[(int)timeAtual].nome) : sprintf(msgTruco, "Time %s aceitou o %d", times[(int)timeAtual].nome, (trucos+1)*3);
+                        (trucos == 0) ? sprintf(msgTruco, "Time %s não aceitou o truco", times[(int)timeAtual].nome) : sprintf(msgTruco, "Time %s não aceitou o %d", times[(int)timeAtual].nome, (trucos+1)*3);
                         goto fimTurno;
                     }
                 }
